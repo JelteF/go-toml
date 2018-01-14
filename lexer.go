@@ -173,8 +173,10 @@ func (l *tomlLexer) lexRvalue() tomlLexStateFn {
 			l.depth--
 			return l.lexRightBracket
 		case '{':
+			l.depth++
 			return l.lexLeftCurlyBrace
 		case '}':
+			l.depth--
 			return l.lexRightCurlyBrace
 		case '#':
 			return l.lexComment(l.lexRvalue)
