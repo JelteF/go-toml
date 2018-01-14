@@ -804,3 +804,44 @@ func TestMarshalArrayOnePerLine(t *testing.T) {
 		t.Errorf("Bad arrays marshal: expected\n-----\n%s\n-----\ngot\n-----\n%s\n-----\n", expected, b)
 	}
 }
+
+var durationToml = []byte(`
+duration = 23d
+duration2 = 23
+integer64 = 23ms
+integer32 = 23ms
+integer16 = 23ns
+integer8 = 23ns
+integer = 23ms
+`)
+
+type durationMarshalTestStruct struct {
+	Duration  time.Duration `toml:"duration"`
+	Duration2 time.Duration `toml:"duration2"`
+	Integer64 int64         `toml:"integer64"`
+	Integer32 int32         `toml:"integer32"`
+	Integer16 int16         `toml:"integer16"`
+	Integer8  int8          `toml:"integer8"`
+	Integer   int           `toml:"integer"`
+}
+
+func TestUnmarshalDuration(t *testing.T) {
+	result := durationMarshalTestStruct{}
+	err := Unmarshal(durationToml, &result)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := durationMarshalTestStruct{
+		Duration:  23 * 24 * time.Hour,
+		Duration2: 23,
+		Integer64: int64(23 * time.Millisecond),
+		Integer32: int32(23 * time.Millisecond),
+		Integer16: 23,
+		Integer8:  23,
+		Integer:   int(23 * time.Millisecond),
+	}
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Bad unmarshal: expected %v, got %v", expected, result)
+	}
+}
