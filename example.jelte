@@ -1,10 +1,17 @@
-[nested]
+[very.deeply.nested]
 
-very = {
-    deep = {
-        really = {
-            deep = { a = 'b' },
+list_of_tables = [
+    {
+        name = 'a',
+        content = {
+            backend = 'postgres'
         }
-    }
-}
+    },
+    {
+        name = 'b',
+        content = {
+            backend = 'redis'
+        }
+    },
+]
 
