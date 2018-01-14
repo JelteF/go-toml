@@ -13,5 +13,11 @@ list_of_tables = [
             backend = 'redis'
         }
     },
+    {
+        name = 'c',
+        content = {
+            backend = 'memcached'
+        }
+    },
 ]
 
