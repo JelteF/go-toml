@@ -302,7 +302,7 @@ func (p *tomlParser) parseRvalue() interface{} {
 		}
 		return val
 	case tokenDuration:
-		val, err := time.ParseDuration(tok.val)
+		val, err := ParseDuration(tok.val)
 		if err != nil {
 			p.raiseError(tok, "%s", err)
 		}
