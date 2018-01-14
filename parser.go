@@ -306,7 +306,7 @@ func (p *tomlParser) parseRvalue() interface{} {
 		if err != nil {
 			p.raiseError(tok, "%s", err)
 		}
-		return int64(val)
+		return val
 	case tokenLeftBracket:
 		return p.parseArray()
 	case tokenLeftCurlyBrace:
