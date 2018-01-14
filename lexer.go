@@ -93,6 +93,14 @@ func (l *tomlLexer) peek() rune {
 	return l.input[l.inputIdx]
 }
 
+func (l *tomlLexer) peekN(n int) rune {
+	n += l.inputIdx
+	if n >= len(l.input) {
+		return eof
+	}
+	return l.input[n]
+}
+
 func (l *tomlLexer) peekString(size int) string {
 	maxIdx := len(l.input)
 	upperIdx := l.inputIdx + size // FIXME: potential overflow
@@ -224,7 +232,7 @@ func (l *tomlLexer) lexRvalue() tomlLexStateFn {
 		}
 
 		if next == '+' || next == '-' || isDigit(next) {
-			return l.lexNumber
+			return l.lexNumberOrDuration
 		}
 
 		if isAlphanumeric(next) {
@@ -592,6 +600,86 @@ func isValidOctalRune(r rune) bool {
 
 func isValidBinaryRune(r rune) bool {
 	return r == '0' || r == '1' || r == '_'
+}
+
+func (l *tomlLexer) lexNumberOrDuration() tomlLexStateFn {
+	isDuration := false
+LoopNumberOrDuration:
+	for i := 0; ; i++ {
+		next := l.peekN(i)
+		if isDigit(next) {
+			continue
+		}
+		switch next {
+		case '.', '+', '-', '_':
+			continue LoopNumberOrDuration
+		case 's', 'h', 'm', 'n':
+			isDuration = true
+		case 'e', 'E':
+		}
+		break
+	}
+
+	if isDuration {
+		return l.lexDuration
+	}
+	return l.lexNumber
+}
+
+func (l *tomlLexer) lexDuration() tomlLexStateFn {
+	r := l.peek()
+	if r == '+' || r == '-' {
+		l.next()
+	}
+
+	pointSeen := false
+	digitSeen := false
+LoopDuration:
+	for {
+		next := l.peek()
+		if isDigit(next) {
+			digitSeen = true
+			l.next()
+			continue
+		}
+		switch next {
+		case '.':
+			if pointSeen {
+				return l.errorf("cannot have two dots in one duration component")
+			}
+			l.next()
+			if !isDigit(l.peek()) {
+				return l.errorf("duration component cannot end with a dot")
+			}
+			pointSeen = true
+		case '_':
+			l.next()
+		case 'm', 'h', 's', 'n':
+			l.next()
+			if next == 'n' {
+				if l.peek() != 's' {
+					return l.errorf("unknown duration type found")
+				}
+			}
+			if next == 'm' {
+				if l.peek() == 's' {
+					l.next()
+				}
+			}
+			pointSeen = false
+			digitSeen = false
+		default:
+			break LoopDuration
+		}
+
+		if pointSeen && !digitSeen {
+			return l.errorf("cannot start duration component with a dot")
+		}
+	}
+
+	l.emit(tokenDuration)
+
+	return l.lexRvalue
 }
 
 func (l *tomlLexer) lexNumber() tomlLexStateFn {
