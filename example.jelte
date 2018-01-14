@@ -1,23 +1,33 @@
-[very.deeply.nested]
+[shared_settings.logging]
 
-list_of_tables = [
+handlers = [
     {
-        name = 'a',
-        content = {
-            backend = 'postgres'
-        }
+        name = "default",
+        output =  "stdout",
+        level = "info"
     },
     {
-        name = 'b',
-        content = {
-            backend = 'redis'
-        }
+        name = "stderr",
+        output =  "stderr",
+        level = "error"
     },
     {
-        name = 'c',
-        content = {
-            backend = 'memcached'
-        }
+        name = "access",
+        output =  "/var/log/access.log",
+        level = "info"
+    }
+]
+
+loggers = [
+    {
+        name = "default",
+        level = "info",
+        handlers = ["default", "stderr"]
+    },
+    {
+        name = "access",
+        level = "info",
+        handlers = ["default"]
     },
 ]
 
