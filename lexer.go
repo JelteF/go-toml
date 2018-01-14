@@ -616,7 +616,7 @@ LoopNumberOrDuration:
 		switch next {
 		case '.', '+', '-', '_':
 			continue LoopNumberOrDuration
-		case 'h', 'm', 's', mu1, mu2, 'n':
+		case 'd', 'h', 'm', 's', mu1, mu2, 'n':
 			isDuration = true
 		case 'e', 'E':
 		}
@@ -662,7 +662,7 @@ LoopDuration:
 				return l.errorf("unknown duration type found")
 			}
 			fallthrough
-		case 'h', 'm', 's':
+		case 'd', 'h', 'm', 's':
 			l.next()
 			if next == 'm' {
 				if l.peek() == 's' {
