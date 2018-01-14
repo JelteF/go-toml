@@ -7,4 +7,16 @@ micro1 = 1µs # U+00B5 = micro symbol
 micro2 = 1μs # U+03BC = Greek letter mu
 nano = 1ns
 
+# allows floats
+micro3 = 0.1ms
+
+# allows combining
+two_and_a_half_hours = 2h30m
+# not advised but possible
+five_seconds = 2s3s
+
+# can be negative
+minus_one_seconds = -1s
+
+# allows underscores
 hundred_thousand_hours = 100_000h
