@@ -16,6 +16,9 @@ import (
 
 var dateRegexp *regexp.Regexp
 
+const mu1 rune = 'µ'
+const mu2 rune = 'μ'
+
 // Define state functions
 type tomlLexStateFn func() tomlLexStateFn
 
@@ -613,7 +616,7 @@ LoopNumberOrDuration:
 		switch next {
 		case '.', '+', '-', '_':
 			continue LoopNumberOrDuration
-		case 's', 'h', 'm', 'n':
+		case 's', 'h', 'm', 'n', mu1, mu2:
 			isDuration = true
 		case 'e', 'E':
 		}
@@ -654,13 +657,13 @@ LoopDuration:
 			pointSeen = true
 		case '_':
 			l.next()
-		case 'm', 'h', 's', 'n':
-			l.next()
-			if next == 'n' {
-				if l.peek() != 's' {
-					return l.errorf("unknown duration type found")
-				}
+		case 'n', mu1, mu2:
+			if l.peekN(1) != 's' {
+				return l.errorf("unknown duration type found")
 			}
+			fallthrough
+		case 'm', 'h', 's':
+			l.next()
 			if next == 'm' {
 				if l.peek() == 's' {
 					l.next()

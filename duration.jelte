@@ -1,1 +1,7 @@
-second = 10s
+hour = 1h
+minute = 1m
+second = 1s
+milli = 1ms
+micro1 = 1µs # U+00B5 = micro symbol
+micro2 = 1μs # U+03BC = Greek letter mu
+nano = 1ns
