@@ -233,6 +233,10 @@ func cleanupNumberToken(value string) string {
 	return cleanedVal
 }
 
+func cleanupDurationToken(value string) string {
+	return cleanupNumberToken(value)
+}
+
 func (p *tomlParser) parseRvalue() interface{} {
 	tok := p.getToken()
 	if tok == nil || tok.typ == tokenEOF {
@@ -302,7 +306,7 @@ func (p *tomlParser) parseRvalue() interface{} {
 		}
 		return val
 	case tokenDuration:
-		val, err := ParseDuration(tok.val)
+		val, err := ParseDuration(cleanupDurationToken(tok.val))
 		if err != nil {
 			p.raiseError(tok, "%s", err)
 		}
