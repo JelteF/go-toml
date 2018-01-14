@@ -3,7 +3,7 @@
 very = {
     deep = {
         really = {
-            deep = { a = 'b' }
+            deep = { a = 'b' },
         }
     }
 }

@@ -354,9 +354,6 @@ Loop:
 		}
 		previous = follow
 	}
-	if tokenIsComma(previous) {
-		p.raiseError(previous, "trailing comma at the end of inline table")
-	}
 	return tree
 }
 
