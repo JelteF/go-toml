@@ -47,7 +47,7 @@ func assertTree(t *testing.T, tree *Tree, err error, ref map[string]interface{})
 func TestCreateSubTree(t *testing.T) {
 	tree := newTree()
 	tree.createSubTree([]string{"a", "b", "c"}, Position{})
-	tree.Set("a.b.c", "", false, 42)
+	tree.Set("a.b.c", 42)
 	if tree.Get("a.b.c") != 42 {
 		t.Fail()
 	}
@@ -71,6 +71,17 @@ func TestNumberInKey(t *testing.T) {
 	assertTree(t, tree, err, map[string]interface{}{
 		"hello2": int64(42),
 	})
+}
+
+func TestIncorrectKeyExtraSquareBracket(t *testing.T) {
+	_, err := Load(`[a]b]
+zyx = 42`)
+	if err == nil {
+		t.Error("Error should have been returned.")
+	}
+	if err.Error() != "(1, 4): unexpected token" {
+		t.Error("Bad error message:", err.Error())
+	}
 }
 
 func TestSimpleNumbers(t *testing.T) {
@@ -225,6 +236,36 @@ func TestSpaceKey(t *testing.T) {
 	tree, err := Load("\"a b\" = \"hello world\"")
 	assertTree(t, tree, err, map[string]interface{}{
 		"a b": "hello world",
+	})
+}
+
+func TestDoubleQuotedKey(t *testing.T) {
+	tree, err := Load(`
+	"key"        = "a"
+	"\t"         = "b"
+	"\U0001F914" = "c"
+	"\u2764"     = "d"
+	`)
+	assertTree(t, tree, err, map[string]interface{}{
+		"key":        "a",
+		"\t":         "b",
+		"\U0001F914": "c",
+		"\u2764":     "d",
+	})
+}
+
+func TestSingleQuotedKey(t *testing.T) {
+	tree, err := Load(`
+	'key'        = "a"
+	'\t'         = "b"
+	'\U0001F914' = "c"
+	'\u2764'     = "d"
+	`)
+	assertTree(t, tree, err, map[string]interface{}{
+		`key`:        "a",
+		`\t`:         "b",
+		`\U0001F914`: "c",
+		`\u2764`:     "d",
 	})
 }
 
